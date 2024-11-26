@@ -1,0 +1,1 @@
+ansible-playbook -i inventory.yml web.yml 

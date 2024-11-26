@@ -1,0 +1,1 @@
+ansible dc_east -i inventory.yml -m ping
