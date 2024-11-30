@@ -1,0 +1,71 @@
+---
+# tasks file for post-install
+- name: Install ntp agent on CentOS
+  yum:
+    name: "{{item}}"
+    state: present
+  when: ansible_distribution == "CentOS"
+  loop: 
+    - chrony
+    - wget
+    - git
+    - zip
+    - unzip
+
+- name: Install ntp agent on Ubuntu
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+    state: present
+  when: ansible_distribution == "Ubuntu"
+  loop: 
+    - ntp
+    - wget
+    - git
+    - zip
+    - unzip
+
+- name: Start service on CentoOS
+  service: 
+    name: chronyd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Start service on Ubuntu
+  service: 
+    name: ntp
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Banner file
+  copy: 
+    content: '# This server is managed by Ansible Playbooks. No manual changes please!'
+    dest: /etc/mot
+
+- name: Create a folder
+  file: 
+    path: "{{mydir}}"
+    state: directory
+
+- name: Dump file
+  copy: 
+    src: myfile.txt
+    dest: /tmp/myfile.txt
+
+- name: Deploy NTP agent config on CentOS
+  template:
+    backup: yes
+    src: ntpconfig_centos.j2
+    dest: /etc/chrony.conf
+  when: ansible_distribution == "CentOS"
+  
+- name: Deploy NTP agent config on Ubuntu
+  template:
+    backup: yes
+    src: ntpconfig_ubuntu.j2
+    dest: /etc/ntpsec/ntp.conf
+  when: ansible_distribution == "Ubuntu"
+  notify: 
+    - Restart NTP service on Ubuntu

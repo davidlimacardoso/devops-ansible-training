@@ -1,0 +1,32 @@
+---
+- name: Provisioning Servers
+  hosts : all
+  become: yes
+  
+  tasks: 
+    - name: Install ntp agent on CentOS
+      yum:
+        name: chrony
+        state: present
+      when: ansible_distribution == "CentOS"
+   
+    - name: Install ntp agent on Ubuntu
+      apt:
+        name: ntp
+        update_cache: yes
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Start service on CentoOS
+      service: 
+        name: chronyd
+        state: started
+        enabled: yes
+      when: ansible_distribution == "CentOS"
+    
+    - name: Start service on CentoOS
+      service: 
+        name: ntp
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Ubuntu"

@@ -1,0 +1,12 @@
+---
+- name: Provisioning Servers
+  hosts : all
+  become: yes
+  roles: 
+    - role: geerlingguy.java
+    - role: post-install
+      vars: 
+        ntp0: a.st1.ntp.br
+        ntp1: b.st1.ntp.br
+        ntp2: c.st1.ntp.br
+        ntp3: d.st1.ntp.br

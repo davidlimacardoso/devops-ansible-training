@@ -1,0 +1,53 @@
+---
+- hosts: localhost
+  gather_facts: False
+  vars:
+    region: "us-east-1"
+    project: ansible
+    env: test
+    key_name: sample_key
+
+  tasks: 
+    - name: create a new ec2 key pair
+      ec2_key:
+        name: "{{key_name}}"
+        region: "{{region}}"
+      register: keyout
+    
+    # - name: Print key pair
+    #   debug: 
+    #         var: keyout
+
+    - name: Save key
+      copy:
+        content: "{{keyout.key.private_key}}"
+        dest: ./"{{key_name}}".pem
+      when: keyout.changed
+    
+
+    - name: create a new ec2 instance
+      ec2_instance:
+        name: "{{project}}-instance"
+        key_name: "{{key_name}}"
+        vpc_subnet_id: subnet-04e972ab97a50a310
+        instance_type: t2.micro
+        security_group: sg-0d80f5372a2c300cf
+        region: "{{region}}"
+        # network:
+        #   assign_public_ip: false
+        image_id: ami-0453ec754f44f9a4a
+        exact_count: 1
+        volumes:
+          - device_name: /dev/xvda
+            ebs:
+              delete_on_termination: true
+              encrypted: yes
+        state: stopped
+        tags:
+          Environment: "{{env}}"
+          Name: "{{project}}-instance"
+      register: ec2out
+
+    # - name: EC2 instance output
+    #   debug: 
+    #     var: ec2out.instances.

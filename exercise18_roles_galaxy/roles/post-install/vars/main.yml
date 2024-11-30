@@ -1,0 +1,5 @@
+---
+# vars file for post-install
+USRM: commomuser
+COMM: variable from groupvars_all file
+mydir: /opt/dir22
